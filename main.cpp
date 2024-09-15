@@ -26,12 +26,12 @@ void test_x_f1(){
         std::cout<< "x:" << x() << std::endl;
         test(x() == 3, "f1 test 1.1");
 
-        xvar<int> y = x_f1(int, x, x*x);
+        xvar<int> y = x_f1(int, x*x, x);
         std::cout<< "y:" << y() << std::endl;
         test(y() == 9, "f1 test 1.2.1");
-        x.setValue(4);
 
         std::cout<< "***********" << std::endl;
+        x.setValue(4);
 
         std::cout<< "y:" << y() << std::endl;
         test(y() == 16, "f1 test 1.2.2");
@@ -44,7 +44,7 @@ void test_x_f1(){
         std::cout<< "x:" << x() << std::endl;
         test(x() == 3, "f1 test 2.1");
 
-        xvar<std::string> y = x_f1(std::string, x, std::to_string(x) + "_kkk");
+        xvar<std::string> y = x_f1(std::string, std::to_string(x) + "_kkk", x);
         std::cout<< "y:" << y() << std::endl;
         test(y() == "3_kkk", "f1 test 2.1.1");
 
@@ -56,14 +56,56 @@ void test_x_f1(){
     }
 }
 
+void test_x_f2(){
+    {
+        xvar<int> x = x_f0(int, 3);
+        xvar<int> y = x_f0(int, 4);
+        std::cout<< "x:" << x() << " y:" << y() << std::endl;
+        test(x() == 3, "f1 test 1.1.1");
+        test(y() == 4, "f1 test 1.1.2");
+
+
+        xvar<int> z = x_f2(int, x+y, x, y);
+        std::cout<< "z:" << z() << std::endl;
+        test(z() == 7, "f1 test 1.2.1");
+
+        std::cout<< "***********" << std::endl;
+        x.setValue(5);
+
+        std::cout<< "y:" << z() << std::endl;
+        test(z() == 9, "f1 test 1.2.2");
+    }
+
+    std::cout<< "===========" << std::endl;
+}
+
+void test_x_f2_auto(){
+    {
+        auto x = x_f0(int, 3);
+        auto y = x_f0(int, 4);
+        std::cout<< "x:" << x() << " y:" << y() << std::endl;
+        test(x() == 3, "f1 test 1.1.1");
+        test(y() == 4, "f1 test 1.1.2");
+
+        auto z = x_f2(int, x+y, x, y);
+        std::cout<< "z:" << z() << std::endl;
+        test(z() == 7, "f1 test 1.2.1");
+
+        std::cout<< "***********" << std::endl;
+        x.setValue(5);
+
+        std::cout<< "y:" << z() << std::endl;
+        test(z() == 9, "f1 test 1.2.2");
+    }
+
+    std::cout<< "===========" << std::endl;
+}
+
 int main() {
     test_x_f0();
     test_x_f1();
-
-    // xvar<int> w = x_f1(int, x, x*x);
-    // std::cout<< "w:" << w() << std::endl;
-    // assert(w() == 9);
-    // x.setValue(4);
+    test_x_f2();
+    test_x_f2_auto();
 
     return 0;
 }

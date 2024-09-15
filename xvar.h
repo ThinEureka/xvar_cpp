@@ -130,19 +130,21 @@ class xvar_f1 : public xvar_value<T> {
 template <typename T, typename S1, typename S2>
 class xvar_f2 : public xvar_value<T> {
     public:
-        xvar_f2(const std::function<T(S1, S2)>& f, xvar_value<S1>* s1, xvar_value<S2>* s2) {
-            _f = f;
-            _s1 = s1;
-            _s2 = s2;
-            s1->addSink(this);
-            xvar_base::_isDirty = true;
+        static std::shared_ptr<xvar_base> create(const std::function<T(S1, S2)>& f, xvar_value<S1>* s1, xvar_value<S1>* s2) {
+            xvar_f2* x = new xvar_f2();
+            x->_f = f;
+            x->_s1 = s1;
+            x->_s2 = s2;
+            x->_isDirty = true;
+            auto s_x = x->s_this();
+            s1->addSink(x);
+            s2->addSink(x);
+            return s_x;
         }
 
     protected:
-        virtual void validate() override {
-            if (_s1->_isDirty) _s1->validate();
-            if (_s2->_isDirty) _s2->validate();
-            xvar_value<T>::_value = _f(_s1->_value, _s2->value);
+        void evaluate() override {
+            xvar_value<T>::_value = _f(_s1->_value, _s2->_value);
         }
 
     private:
@@ -191,8 +193,13 @@ class xvar {
         std::shared_ptr<xvar_base> _p;
 };
 
-#define x_f0(type, value) xvar_f0<type>::create((value));
-#define x_f1(T, x, exp) xvar_f1<T, decltype(x)::ValueType>::create([=](decltype(x)::ValueType x)-> T {return (exp);}, x.p())
+#define x_f0(T, value) xvar<T>(xvar_f0<T>::create((value)))
+
+#define x_f1(T, exp, x) xvar<T>(xvar_f1<T, decltype(x)::ValueType>::create \
+    ([=](decltype(x)::ValueType x)-> T {return (exp);}, x.p()))
+
+#define x_f2(T, exp, x1, x2) xvar<T>(xvar_f2<T, decltype(x1)::ValueType, decltype(x2)::ValueType>::create\
+    ([=](decltype(x1)::ValueType x1, decltype(x2)::ValueType x2)-> T {return (exp);}, x1.p(), x2.p()))
 
 
 
