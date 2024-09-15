@@ -117,7 +117,7 @@ void test_x_operator_add(){
         x.setValue(5);
 
         std::cout<< "z:" << z() << std::endl;
-        test(z() == 9, "operator_add test 1.2.1");
+        test(z() == 9, "operator_add test 1.2.2");
     }
 
     std::cout<< "===========" << std::endl;
