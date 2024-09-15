@@ -3,13 +3,21 @@
 #include <assert.h>
 
 
-
 int main() {
+    xvar_ptr<int> x = X_CONST(int, 3);
+    std::cout<< "x:" << x() << std::endl;
+    assert(x() == 3);
 
-    X_CONST(int, z, 3);
-    assert(z() == 3);
+    std::cout<< "===========" << std::endl;
+    xvar_ptr<int> w = X_F1(int, x, x*x);
+    std::cout<< "w:" << w() << std::endl;
+    assert(w() == 9);
 
-    std::cout<< "z:" << z() << std::endl;
+    x.setValue(4);
+
+    std::cout<< "w:" << w() << std::endl;
+    assert(w() == 16);
+
     return 0;
 }
 
