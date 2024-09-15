@@ -1,3 +1,10 @@
+/*!
+ * \file AsysValue.h
+ * \date 9-15-2024 
+ * 
+ * 
+ * \author cs (04nycs@gmail.com)
+ */
 
 #include <functional>
 #include <memory>
@@ -201,7 +208,7 @@ auto operator + (xvar<S1> s1, xvar<S2> s2) -> xvar<decltype(s1() + s2())> {
 template<typename S1>
 auto operator - (xvar<S1> s1) -> xvar<decltype(-s1())> {
     typedef decltype(-s1()) T;
-     return xvar<T>(xvar_f1<T, S1>::create([](S1 s1)-> T {return -s1;}, s1.p()));
+    return xvar<T>(xvar_f1<T, S1>::create([](S1 s1)-> T {return -s1;}, s1.p()));
 }
 
 #define x_f0(T, value) xvar<T>(xvar_f0<T>::create((value)))
