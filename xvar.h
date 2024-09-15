@@ -69,7 +69,7 @@ class xvar_base {
 };
 
 template <typename T>
-class xvar : public xvar_base {
+class xvar_value : public xvar_base {
     public:
         virtual const T& operator () (){ 
             if (!xvar_base::_isDirty) {
@@ -83,19 +83,19 @@ class xvar : public xvar_base {
 };
 
 template <typename T>
-class xvar_const : public xvar<T> {
+class xvar_const : public xvar_value<T> {
     public:
         static std::shared_ptr<xvar_base> create(const T v) {
             xvar_const* x = new xvar_const();
-            x->xvar<T>::_value = v;
+            x->xvar_value<T>::_value = v;
             x->xvar_base::_isDirty = true;
             auto s_x = x->s_this();
             return s_x;
         }
 
         void setValue(const T& v) {
-            xvar<T>::_value = v;
-            xvar<T>::setDirty();
+            xvar_value<T>::_value = v;
+            xvar_value<T>::setDirty();
         }
 
     protected:
@@ -105,9 +105,9 @@ class xvar_const : public xvar<T> {
 };
 
 template <typename T, typename S1>
-class xvar_f1 : public xvar<T> {
+class xvar_f1 : public xvar_value<T> {
     public:
-        static std::shared_ptr<xvar_base> create(const std::function<T(S1)>& f, xvar<S1>* s1) {
+        static std::shared_ptr<xvar_base> create(const std::function<T(S1)>& f, xvar_value<S1>* s1) {
             xvar_f1* x = new xvar_f1();
             x->_f = f;
             x->_s1 = s1;
@@ -119,18 +119,18 @@ class xvar_f1 : public xvar<T> {
 
     protected:
         void evaluate() override {
-            xvar<T>::_value = _f(_s1->_value);
+            xvar_value<T>::_value = _f(_s1->_value);
         }
 
     private:
         std::function<T(S1)> _f;
-        xvar<S1>* _s1;
+        xvar_value<S1>* _s1;
 };
 
 template <typename T, typename S1, typename S2>
-class xvar_f2 : public xvar<T> {
+class xvar_f2 : public xvar_value<T> {
     public:
-        xvar_f2(const std::function<T(S1, S2)>& f, xvar<S1>* s1, xvar<S2>* s2) {
+        xvar_f2(const std::function<T(S1, S2)>& f, xvar_value<S1>* s1, xvar_value<S2>* s2) {
             _f = f;
             _s1 = s1;
             _s2 = s2;
@@ -142,34 +142,34 @@ class xvar_f2 : public xvar<T> {
         virtual void validate() override {
             if (_s1->_isDirty) _s1->validate();
             if (_s2->_isDirty) _s2->validate();
-            xvar<T>::_value = _f(_s1->_value, _s2->value);
+            xvar_value<T>::_value = _f(_s1->_value, _s2->value);
         }
 
     private:
         std::function<T(S1, S2)> _f;
-        xvar<S1>* _s1;
-        xvar<S2>* _s2;
+        xvar_value<S1>* _s1;
+        xvar_value<S2>* _s2;
 };
 
 template<typename T>
-class xvar_ptr {
+class xvar {
     public:
         typedef T ValueType;
-        typedef xvar<T> VariableType;
+        typedef xvar_value<T> VariableType;
 
-        xvar<T>* p() {
+        xvar_value<T>* p() {
             xvar_base* rawPtr = _p.get();
-            xvar<T>* rawPtrT = static_cast<xvar<T>*>(rawPtr);
+            xvar_value<T>* rawPtrT = static_cast<xvar_value<T>*>(rawPtr);
             return rawPtrT;
         }
 
-        xvar_ptr(std::shared_ptr<xvar_base> p) {
+        xvar(std::shared_ptr<xvar_base> p) {
             _p = p;
         }
 
         virtual const T& operator () (){ 
             xvar_base* rawPtr = _p.get();
-            xvar<T>* rawPtrT = dynamic_cast<xvar<T>*>(rawPtr);
+            xvar_value<T>* rawPtrT = dynamic_cast<xvar_value<T>*>(rawPtr);
             if (rawPtrT) {
                 return (*rawPtrT)();
             }
@@ -191,15 +191,8 @@ class xvar_ptr {
         std::shared_ptr<xvar_base> _p;
 };
 
-// #define X_CONST(type, name, value) std::shared_ptr<xvar_const<type>> name = (new xvar_const<type>((value)))->s_this()
-// #define X_CONST(type, name, value) std::shared_ptr<xvar_const<type>> name;// = (new xvar_const<type>((value)))->s_this()
-// #define X_CONST(type, name, value) std::shared_ptr<xvar_const<type>> name = std::static_pointer_cast<xvar_const<type>>((new xvar_const<type>((value)))->s_this());
-//
-//
-//
-#define X_CONST(type, value) xvar_const<type>::create((value));
-// #define X_F1(T, x, exp) (new xvar_f1<T, decltype(x)::ValueType>([=](decltype(x)::ValueType x) -> T {return (exp); }, x))->s_this();
-#define X_F1(T, x, exp) xvar_f1<T, decltype(x)::ValueType>::create([=](decltype(x)::ValueType x)-> T {return (exp);}, x.p())
+#define x_const(type, value) xvar_const<type>::create((value));
+#define x_f1(T, x, exp) xvar_f1<T, decltype(x)::ValueType>::create([=](decltype(x)::ValueType x)-> T {return (exp);}, x.p())
 
 
 
