@@ -83,10 +83,10 @@ class xvar_value : public xvar_base {
 };
 
 template <typename T>
-class xvar_const : public xvar_value<T> {
+class xvar_f0 : public xvar_value<T> {
     public:
         static std::shared_ptr<xvar_base> create(const T v) {
-            xvar_const* x = new xvar_const();
+            xvar_f0* x = new xvar_f0();
             x->xvar_value<T>::_value = v;
             x->xvar_base::_isDirty = true;
             auto s_x = x->s_this();
@@ -177,9 +177,9 @@ class xvar {
             return (*rawPtrT)();
         }
 
-        void setValue(const T v) {
+        void setValue(const T& v) {
             xvar_base* rawPtr = _p.get();
-            xvar_const<T>* rawPtrT = static_cast<xvar_const<T>*>(rawPtr);
+            xvar_f0<T>* rawPtrT = static_cast<xvar_f0<T>*>(rawPtr);
             assert(rawPtrT);
             if (rawPtrT) {
                 rawPtrT->setValue(v);
@@ -191,7 +191,7 @@ class xvar {
         std::shared_ptr<xvar_base> _p;
 };
 
-#define x_const(type, value) xvar_const<type>::create((value));
+#define x_f0(type, value) xvar_f0<type>::create((value));
 #define x_f1(T, x, exp) xvar_f1<T, decltype(x)::ValueType>::create([=](decltype(x)::ValueType x)-> T {return (exp);}, x.p())
 
 
