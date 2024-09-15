@@ -61,19 +61,19 @@ void test_x_f2(){
         xvar<int> x = x_f0(int, 3);
         xvar<int> y = x_f0(int, 4);
         std::cout<< "x:" << x() << " y:" << y() << std::endl;
-        test(x() == 3, "f1 test 1.1.1");
-        test(y() == 4, "f1 test 1.1.2");
+        test(x() == 3, "f2 test 1.1.1");
+        test(y() == 4, "f2 test 1.1.2");
 
 
         xvar<int> z = x_f2(int, x+y, x, y);
         std::cout<< "z:" << z() << std::endl;
-        test(z() == 7, "f1 test 1.2.1");
+        test(z() == 7, "f2 test 1.2.1");
 
         std::cout<< "***********" << std::endl;
         x.setValue(5);
 
         std::cout<< "y:" << z() << std::endl;
-        test(z() == 9, "f1 test 1.2.2");
+        test(z() == 9, "f2 test 1.2.2");
     }
 
     std::cout<< "===========" << std::endl;
@@ -84,18 +84,39 @@ void test_x_f2_auto(){
         auto x = x_f0(int, 3);
         auto y = x_f0(int, 4);
         std::cout<< "x:" << x() << " y:" << y() << std::endl;
-        test(x() == 3, "f1 test 1.1.1");
-        test(y() == 4, "f1 test 1.1.2");
+        test(x() == 3, "f2 auto test 1.1.1");
+        test(y() == 4, "f2 auto test 1.1.2");
 
         auto z = x_f2(int, x+y, x, y);
         std::cout<< "z:" << z() << std::endl;
-        test(z() == 7, "f1 test 1.2.1");
+        test(z() == 7, "f2 auto test 1.2.1");
 
         std::cout<< "***********" << std::endl;
         x.setValue(5);
 
         std::cout<< "y:" << z() << std::endl;
-        test(z() == 9, "f1 test 1.2.2");
+        test(z() == 9, "f2 auto test 1.2.2");
+    }
+
+    std::cout<< "===========" << std::endl;
+}
+
+void test_x_operator_add(){
+    {
+        auto x = x_f0(int, 3);
+        auto y = x_f0(int, 4);
+        std::cout<< "x:" << x() << " y:" << y() << std::endl;
+        test(x() == 3, "operator_add test 1.1.1");
+        test(y() == 4, "operator_add test 1.1.2");
+
+        auto z = x + y;
+        std::cout<< "z:" << z() << std::endl;
+        test(z() == 7, "operator_add test 1.2.1");
+
+        std::cout<< "***********" << std::endl;
+        x.setValue(5);
+
+        std::cout<< "y:" << z() << std::endl;
     }
 
     std::cout<< "===========" << std::endl;
@@ -106,6 +127,7 @@ int main() {
     test_x_f1();
     test_x_f2();
     test_x_f2_auto();
+    test_x_operator_add();
 
     return 0;
 }

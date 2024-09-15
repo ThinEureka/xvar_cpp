@@ -62,7 +62,7 @@ class xvar_base {
         virtual void evaluate() = 0;
 
     protected:
-        bool _isDirty;
+        bool _isDirty = true;
         std::vector<std::weak_ptr<xvar_base>> _sinks;
         std::vector<std::shared_ptr<xvar_base>> _sources;
         std::weak_ptr<xvar_base> _w_this;
@@ -88,7 +88,7 @@ class xvar_f0 : public xvar_value<T> {
         static std::shared_ptr<xvar_base> create(const T v) {
             xvar_f0* x = new xvar_f0();
             x->xvar_value<T>::_value = v;
-            x->xvar_base::_isDirty = true;
+            // x->xvar_base::_isDirty = true;
             auto s_x = x->s_this();
             return s_x;
         }
@@ -111,7 +111,7 @@ class xvar_f1 : public xvar_value<T> {
             xvar_f1* x = new xvar_f1();
             x->_f = f;
             x->_s1 = s1;
-            x->_isDirty = true;
+            // x->_isDirty = true;
             auto s_x = x->s_this();
             s1->addSink(x);
             return s_x;
@@ -135,7 +135,7 @@ class xvar_f2 : public xvar_value<T> {
             x->_f = f;
             x->_s1 = s1;
             x->_s2 = s2;
-            x->_isDirty = true;
+            // x->_isDirty = true;
             auto s_x = x->s_this();
             s1->addSink(x);
             s2->addSink(x);
@@ -188,10 +188,17 @@ class xvar {
             }
         }
 
-
     private:
         std::shared_ptr<xvar_base> _p;
 };
+
+template<typename S1, typename S2>
+auto operator + (xvar<S1> s1, xvar<S2> s2) -> xvar<decltype(s1() + s2())> {
+    typedef decltype(s1() + s2()) T;
+    return xvar<T>(
+            xvar_f2<decltype(s1() + s2()), S1, S2>::create
+        ([=](S1 s1, S2 s2)-> T {return s1 + s2;}, s1.p(), s2.p()));
+}
 
 #define x_f0(T, value) xvar<T>(xvar_f0<T>::create((value)))
 
@@ -200,6 +207,5 @@ class xvar {
 
 #define x_f2(T, exp, x1, x2) xvar<T>(xvar_f2<T, decltype(x1)::ValueType, decltype(x2)::ValueType>::create\
     ([=](decltype(x1)::ValueType x1, decltype(x2)::ValueType x2)-> T {return (exp);}, x1.p(), x2.p()))
-
 
 
