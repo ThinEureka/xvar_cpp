@@ -143,6 +143,27 @@ void test_x_operator_unm(){
     std::cout<< "===========" << std::endl;
 }
 
+void test_x_const_lift(){
+    {
+        auto x = x_f0(int, 3);
+        std::cout<< "x:" << x() << std::endl;
+        test(x() == 3, "operator_const_lift test 1.1.1");
+
+        auto z = x + 4;
+        std::cout<< "z:" << z() << std::endl;
+        test(z() == 7, "operator_const_lift test 1.2.1");
+
+        std::cout<< "***********" << std::endl;
+        x.setValue(5);
+
+        std::cout<< "z:" << z() << std::endl;
+        test(z() == 9, "operator_const_lift test 1.2.2");
+    }
+
+    std::cout<< "===========" << std::endl;
+}
+
+
 int main() {
     test_x_f0();
     test_x_f1();
@@ -150,6 +171,7 @@ int main() {
     test_x_f2_auto();
     test_x_operator_add();
     test_x_operator_unm();
+    test_x_const_lift();
 
     return 0;
 }

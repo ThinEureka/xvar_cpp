@@ -92,7 +92,7 @@ class xvar_value : public xvar_base {
 template <typename T>
 class xvar_f0 : public xvar_value<T> {
     public:
-        static std::shared_ptr<xvar_base> create(const T v) {
+        static std::shared_ptr<xvar_base> create(const T& v) {
             xvar_f0* x = new xvar_f0();
             x->xvar_value<T>::_value = v;
             // x->xvar_base::_isDirty = true;
@@ -176,6 +176,11 @@ class xvar {
             _p = p;
         }
 
+        template <typename V>
+        xvar(const V& v){
+            xvar_f0<V>::create(v);
+        }
+
         virtual const T& operator () (){ 
             xvar_base* rawPtr = _p.get();
             xvar_value<T>* rawPtrT = dynamic_cast<xvar_value<T>*>(rawPtr);
@@ -203,6 +208,12 @@ template<typename S1, typename S2>
 auto operator + (xvar<S1> s1, xvar<S2> s2) -> xvar<decltype(s1() + s2())> {
     typedef decltype(s1() + s2()) T;
     return xvar<T>(xvar_f2<T, S1, S2>::create([](S1 s1, S2 s2)-> T {return s1 + s2;}, s1.p(), s2.p()));
+}
+
+template<typename S1, typename S2>
+auto operator + (xvar<S1> s1, const S2& s2) -> xvar<decltype(s1() + s2)> {
+    typedef decltype(s1() + s2) T;
+    return xvar<T>(xvar_f2<T, S1, S2>::create([](S1 s1, S2 s2)-> T {return s1 + s2;}, s1.p(), xvar<S2>(s2).p()));
 }
 
 template<typename S1>
