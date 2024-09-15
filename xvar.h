@@ -200,6 +200,14 @@ auto operator + (xvar<S1> s1, xvar<S2> s2) -> xvar<decltype(s1() + s2())> {
         ([=](S1 s1, S2 s2)-> T {return s1 + s2;}, s1.p(), s2.p()));
 }
 
+// template<typename S1, typename S2>
+// auto operator - (xvar<S1> s1) -> xvar<decltype(-s1())> {
+    // typedef decltype(-s1()) T;
+    // return xvar<T>(
+            // xvar_f2<T, S1, S2>::create
+        // ([=](S1 s1, S2 s2)-> T {return -s1;}, s1.p(), s2.p()));
+// }
+
 #define x_f0(T, value) xvar<T>(xvar_f0<T>::create((value)))
 
 #define x_f1(T, exp, x) xvar<T>(xvar_f1<T, decltype(x)::ValueType>::create \

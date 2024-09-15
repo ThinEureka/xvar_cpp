@@ -94,7 +94,7 @@ void test_x_f2_auto(){
         std::cout<< "***********" << std::endl;
         x.setValue(5);
 
-        std::cout<< "y:" << z() << std::endl;
+        std::cout<< "z:" << z() << std::endl;
         test(z() == 9, "f2 auto test 1.2.2");
     }
 
@@ -116,7 +116,8 @@ void test_x_operator_add(){
         std::cout<< "***********" << std::endl;
         x.setValue(5);
 
-        std::cout<< "y:" << z() << std::endl;
+        std::cout<< "z:" << z() << std::endl;
+        test(z() == 9, "operator_add test 1.2.1");
     }
 
     std::cout<< "===========" << std::endl;
