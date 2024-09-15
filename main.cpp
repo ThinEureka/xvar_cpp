@@ -123,12 +123,33 @@ void test_x_operator_add(){
     std::cout<< "===========" << std::endl;
 }
 
+void test_x_operator_unm(){
+    {
+        auto x = x_f0(int, 3);
+        std::cout<< "x:" << x() << std::endl;
+        test(x() == 3, "operator_unm test 1.1.1");
+
+        auto y = -x;
+        std::cout<< "y:" << y() << std::endl;
+        test(y() == -3, "operator_unm test 1.2.1");
+
+        std::cout<< "***********" << std::endl;
+        x.setValue(5);
+
+        std::cout<< "y:" << y() << std::endl;
+        test(y() == -5, "operator_unm test 1.2.2");
+    }
+
+    std::cout<< "===========" << std::endl;
+}
+
 int main() {
     test_x_f0();
     test_x_f1();
     test_x_f2();
     test_x_f2_auto();
     test_x_operator_add();
+    test_x_operator_unm();
 
     return 0;
 }
