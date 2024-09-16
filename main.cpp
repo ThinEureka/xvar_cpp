@@ -121,6 +121,26 @@ void test_x_operator_add(){
     }
 
     std::cout<< "===========" << std::endl;
+
+    {
+        auto x = x_f0(int, 3);
+        auto y = x_f0(double, 0.5);
+        std::cout<< "x:" << x() << " y:" << y() << std::endl;
+        test(x() == 3, "operator_add test 1.1.1");
+        test(y() == 0.5, "operator_add test 1.1.2");
+
+        xvar<double> z = x + y;
+        std::cout<< "z:" << z() << std::endl;
+        test(z() == 3.5, "operator_add test 1.2.1");
+
+        std::cout<< "***********" << std::endl;
+        x.setValue(5);
+
+        std::cout<< "z:" << z() << std::endl;
+        test(z() == 5.5, "operator_add test 1.2.2");
+    }
+
+    std::cout<< "===========" << std::endl;
 }
 
 void test_x_operator_unm(){

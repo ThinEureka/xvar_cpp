@@ -137,7 +137,7 @@ class xvar_f1 : public xvar_value<T> {
 template <typename T, typename S1, typename S2>
 class xvar_f2 : public xvar_value<T> {
     public:
-        static std::shared_ptr<xvar_base> create(const std::function<T(S1, S2)>& f, xvar_value<S1>* s1, xvar_value<S1>* s2) {
+        static std::shared_ptr<xvar_base> create(const std::function<T(S1, S2)>& f, xvar_value<S1>* s1, xvar_value<S2>* s2) {
             xvar_f2* x = new xvar_f2();
             x->_f = f;
             x->_s1 = s1;
@@ -178,7 +178,7 @@ class xvar {
 
         template <typename V>
         xvar(const V& v){
-            xvar_f0<V>::create(v);
+            _p = xvar_f0<V>::create(v);
         }
 
         virtual const T& operator () (){ 
