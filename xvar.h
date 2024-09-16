@@ -90,6 +90,8 @@ class xvar_value : public xvar_base {
         T _value;
 };
 
+template <typename T> class xvar;
+
 template <typename T>
 class xvar_f0 : public xvar_value<T> {
     public:
@@ -161,6 +163,7 @@ class xvar_f2 : public xvar_value<T> {
         xvar_value<S2>* _s2;
 };
 
+
 template <typename T, typename ...Sn>
 class xvar_fn : public xvar_value<T> {
     public:
@@ -175,9 +178,19 @@ class xvar_fn : public xvar_value<T> {
             return s_x;
         }
 
+        static xvar<T> make_x(const std::function<T(Sn...)>& f, xvar<Sn>... args) {
+            xvar_fn* x = new xvar_fn();
+            x->_f = f;
+            x->_sn = std::tuple(args.p()...);
+            // x->_isDirty = true;
+            auto s_x = x->s_this();
+            (args.p()->addSink(x),...);
+
+            return xvar<T>(s_x);
+        }
+
     protected:
-        void evaluate() override {
-            tupleEvaluate(_sn, std::index_sequence_for<Sn...>());
+        void evaluate() override { tupleEvaluate(_sn, std::index_sequence_for<Sn...>());
         }
 
         template<std::size_t... Is>
@@ -230,6 +243,16 @@ class xvar {
             }
         }
 
+        // template <typename S1>
+        // static xvar f1(const std::function<T(S1)>& f, xvar<S1> s1) {
+            // return xvar(xvar_f1<T, S1>::create(f, s1.p()));
+        // }
+//
+        // template <typename ...Sn>
+        // static xvar fn(const std::function<T(Sn...)>& f, xvar<Sn>... args) {
+            // return xvar(xvar_fn<T, Sn...>::create(f, args...));
+        // }
+
     private:
         std::shared_ptr<xvar_base> _p;
 };
@@ -252,6 +275,7 @@ auto operator - (xvar<S1> s1) -> xvar<decltype(-s1())> {
     return xvar<T>(xvar_f1<T, S1>::create([](S1 s1)-> T {return -s1;}, s1.p()));
 }
 
+
 #define x_f0(T, value) xvar<T>(xvar_f0<T>::create((value)))
 
 #define x_f1(T, exp, x) xvar<T>(xvar_f1<T, decltype(x)::ValueType>::create \
@@ -259,5 +283,6 @@ auto operator - (xvar<S1> s1) -> xvar<decltype(-s1())> {
 
 #define x_f2(T, exp, x1, x2) xvar<T>(xvar_f2<T, decltype(x1)::ValueType, decltype(x2)::ValueType>::create\
     ([=](decltype(x1)::ValueType x1, decltype(x2)::ValueType x2)-> T {return (exp);}, x1.p(), x2.p()))
+
 
 

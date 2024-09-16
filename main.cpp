@@ -185,6 +185,16 @@ void test_x_const_lift(){
     std::cout<< "===========" << std::endl;
 }
 
+template <typename T, typename S1>
+static xvar<T> f1(const std::function<T(S1)>& f, xvar_value<S1>* s1) {
+    return xvar<T>(xvar_f1<T, S1>::create(f, s1));
+}
+
+template <typename T, typename ...Sn>
+static xvar<T> fn(const std::function<T(Sn...)>& f, xvar_value<Sn>... args) {
+    return xvar<T>(xvar_fn<T, Sn...>::create(f, args...));
+}
+
 void test_x_fn() {
     xvar<double> x1 = x_f0(double, 1);
     xvar<int> x2 = x_f0(int, 1);
@@ -200,8 +210,55 @@ void test_x_fn() {
         return x1 + x2 + x3 + x4 + x5;
      }, x1.p(), x2.p(), x3.p(), x4.p(), x5.p()));
 
+
     std::cout<< "y:" << y() << std::endl;
     test(y() == 5.0, "x_fn test 1.1");
+
+    // auto z =  xvar<double>::fn([=](double x1, int x2, char x3, short x4, long x5)-> double {
+        // return x1 + x2 + x3 + x4 + x5;
+     // }, x1, x2, x3, x4, x5);
+     //
+    {
+        // auto y =  xvar<double>::f1([=](double x1)-> double { return x1; }, x1.p());
+        xvar_f1<double, double>::create([=](auto x1){ return x1; }, x1.p());
+
+        // xvar<double>::f1<double>([=](double x1)-> double { return x1; }, x1);
+
+        f1<double, decltype(x1)::ValueType>([=](auto x1){ 
+                int a = 3;
+                return x1 + a; }, x1.p());
+    }
+
+    {
+        // typedef double T;
+        auto y =  xvar<T>(xvar_fn<T, double, int, char, short, long>::create
+                ([=](auto x1, auto x2, auto x3, auto x4, auto x5)-> T {
+                 return x1 + x2 + x3 + x4 + x5;
+                 }, x1.p(), x2.p(), x3.p(), x4.p(), x5.p()));
+    }
+
+    {
+        // typedef double T;
+        auto y =  xvar_fn<T, double, int, char, short, long>::make_x
+                ([=](auto x1, auto x2, auto x3, auto x4, auto x5)-> T {
+                 return x1 + x2 + x3 + x4 + x5;
+                 }, x1, x2, x3, x4, x5);
+    }
+
+    {
+        // typedef double T;
+        // auto y =  xvar<double>::fn<double, int, char, short, long>([=](auto x1, auto x2, auto x3, auto x4, auto x5)-> double {
+                 // return x1 + x2 + x3 + x4 + x5;
+                 // }, x1, x2, x3, x4, x5);
+    }
+
+    {
+        // typedef double T;
+        // auto y =  fn<T, double, int, char, short, long>([=](double x1, int x2, char x3, short x4, long x5)-> T {
+                 // return x1 + x2 + x3 + x4 + x5;
+                 // }, x1.p(), x2.p(), x3.p(), x4.p(), x5.p());
+    }
+
 }
 
 int main() {
