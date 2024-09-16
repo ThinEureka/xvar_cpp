@@ -200,9 +200,8 @@ void test_x_fn() {
         return x1 + x2 + x3 + x4 + x5;
      }, x1.p(), x2.p(), x3.p(), x4.p(), x5.p()));
 
-    y();
-    // std::cout<< "y:" << y() << std::endl;
-    // test(y() == 5.0, "x_fn test 1.1");
+    std::cout<< "y:" << y() << std::endl;
+    test(y() == 5.0, "x_fn test 1.1");
 }
 
 int main() {

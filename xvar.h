@@ -167,7 +167,7 @@ class xvar_fn : public xvar_value<T> {
         static std::shared_ptr<xvar_base> create(const std::function<T(Sn...)>& f, xvar_value<Sn>*... args) {
             xvar_fn* x = new xvar_fn();
             x->_f = f;
-            std::tuple(args...);
+            x->_sn = std::tuple(args...);
             // x->_isDirty = true;
             auto s_x = x->s_this();
             (args->addSink(x),...);
@@ -177,7 +177,7 @@ class xvar_fn : public xvar_value<T> {
 
     protected:
         void evaluate() override {
-             tupleEvaluate(_sn, std::index_sequence_for<Sn...>());
+            tupleEvaluate(_sn, std::index_sequence_for<Sn...>());
         }
 
         template<std::size_t... Is>
