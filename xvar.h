@@ -176,9 +176,8 @@ class xvar {
             _p = p;
         }
 
-        template <typename V>
-        xvar(const V& v){
-            _p = xvar_f0<V>::create(v);
+        xvar(const T& v){
+            _p = xvar_f0<T>::create(v);
         }
 
         virtual const T& operator () (){ 
