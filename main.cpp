@@ -158,6 +158,8 @@ void test_x_operator_unm(){
 
         std::cout<< "y:" << y() << std::endl;
         test(y() == -5, "operator_unm test 1.2.2");
+
+        // x_fn(int, x*y+z - 9 *w, x, y, z, w)
     }
 
     std::cout<< "===========" << std::endl;
@@ -183,6 +185,25 @@ void test_x_const_lift(){
     std::cout<< "===========" << std::endl;
 }
 
+void test_x_fn() {
+    xvar<double> x1 = x_f0(double, 1);
+    xvar<int> x2 = x_f0(int, 1);
+    xvar<char> x3 = x_f0(char, 1);
+    xvar<short> x4 = x_f0(short, 1);
+    xvar<long> x5 = x_f0(long, 1);
+
+    typedef double T;
+    auto y =  xvar<T>(xvar_fn<T, decltype(x1)::ValueType, decltype(x2)::ValueType,
+            decltype(x3)::ValueType, decltype(x4)::ValueType, decltype(x5)::ValueType>::create\
+    ([=](decltype(x1)::ValueType x1, decltype(x2)::ValueType x2, decltype(x3)::ValueType x3,
+         decltype(x4)::ValueType x4, decltype(x5)::ValueType x5)-> T {
+        return x1 + x2 + x3 + x4 + x5;
+     }, x1.p(), x2.p(), x3.p(), x4.p(), x5.p()));
+
+    y();
+    // std::cout<< "y:" << y() << std::endl;
+    // test(y() == 5.0, "x_fn test 1.1");
+}
 
 int main() {
     test_x_f0();
@@ -192,6 +213,7 @@ int main() {
     test_x_operator_add();
     test_x_operator_unm();
     test_x_const_lift();
+    test_x_fn();
 
     return 0;
 }

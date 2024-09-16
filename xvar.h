@@ -10,6 +10,7 @@
 #include <memory>
 #include <iostream>
 #include <assert.h>
+#include <tuple>
 
 class xvar_base {
     public:
@@ -159,6 +160,37 @@ class xvar_f2 : public xvar_value<T> {
         xvar_value<S1>* _s1;
         xvar_value<S2>* _s2;
 };
+
+template <typename T, typename ...Sn>
+class xvar_fn : public xvar_value<T> {
+    public:
+        static std::shared_ptr<xvar_base> create(const std::function<T(Sn...)>& f, xvar_value<Sn>*... args) {
+            xvar_fn* x = new xvar_fn();
+            x->_f = f;
+            std::tuple(args...);
+            // x->_isDirty = true;
+            auto s_x = x->s_this();
+            (args->addSink(x),...);
+
+            return s_x;
+        }
+
+    protected:
+        void evaluate() override {
+            // xvar_value<T>::_value = eveluateUnpack(_sn.tie());
+             call_yadda_with_tuple(_sn, std::index_sequence_for<Sn...>());
+        }
+
+        template<std::size_t... Is>
+        void call_yadda_with_tuple(std::tuple<xvar_value<Sn>*...>& tuple, std::index_sequence<Is...>) {
+            this->xvar_value<T>::_value = _f(std::get<Is>(tuple)->_value...);
+        }
+
+    private:
+        std::function<T(Sn...)> _f;
+        std::tuple<xvar_value<Sn>*...> _sn;
+};
+
 
 template<typename T>
 class xvar {
