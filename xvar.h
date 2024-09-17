@@ -178,7 +178,7 @@ class xvar_fn : public xvar_value<T> {
             return s_x;
         }
 
-        static xvar<T> make_x(const std::function<T(Sn...)>& f, xvar<Sn>... args) {
+        static xvar<T> link(const std::function<T(Sn...)>& f, xvar<Sn>... args) {
             xvar_fn* x = new xvar_fn();
             x->_f = f;
             x->_sn = std::tuple(args.p()...);
@@ -189,8 +189,26 @@ class xvar_fn : public xvar_value<T> {
             return xvar<T>(s_x);
         }
 
+        static std::shared_ptr<xvar_base> create(const std::function<T(Sn...)>& f, const std::tuple<xvar_value<Sn>*...>& sn) {
+            xvar_fn* x = new xvar_fn();
+            x->_f = f;
+            x->_sn = sn;
+            // x->_isDirty = true;
+            auto s_x = x->s_this();
+            // (args->addSink(x),...);
+            tupleAddSkink(x, x->_sn, std::index_sequence_for<Sn...>());
+
+            return s_x;
+        }
+
+        template<std::size_t... Is>
+        static void tupleAddSkink(xvar_fn* x, std::tuple<xvar_value<Sn>*...>& tuple, std::index_sequence<Is...>) {
+            (std::get<Is>(tuple)->addSink(x), ...);
+        }
+
     protected:
-        void evaluate() override { tupleEvaluate(_sn, std::index_sequence_for<Sn...>());
+        void evaluate() override { 
+            tupleEvaluate(_sn, std::index_sequence_for<Sn...>());
         }
 
         template<std::size_t... Is>
@@ -248,14 +266,43 @@ class xvar {
             // return xvar(xvar_f1<T, S1>::create(f, s1.p()));
         // }
 //
-        // template <typename ...Sn>
-        // static xvar fn(const std::function<T(Sn...)>& f, xvar<Sn>... args) {
+        template <typename ...Sn>
+        static void fn(const std::function<T(Sn...)>& f){
             // return xvar(xvar_fn<T, Sn...>::create(f, args...));
-        // }
+            // return xvar();
+            const void* x = &f;
+            std::cout << x;
+        }
 
     private:
         std::shared_ptr<xvar_base> _p;
 };
+
+template<typename... Sn>
+class xvar_tuple{
+    public:
+        xvar_tuple(xvar<Sn>... args) : _sn(args.p()...)
+        {
+        }
+
+        // xvar<T> operator >> (const std::function<T(Sn...)>& f){
+            // return xvar<T>(xvar_fn<T, Sn...>::create(f, _sn));
+        // }
+
+        template <typename T>
+        xvar<T> link(const std::function<T(Sn...)>& f){
+            return xvar<T>(xvar_fn<T, Sn...>::create(f, _sn));
+        }
+//
+    private:
+        std::tuple<xvar_value<Sn>*...> _sn;
+};
+
+template<typename... Sn>
+auto x_tuple(xvar<Sn>... sn)-> xvar_tuple<Sn...> {
+    return xvar_tuple<Sn...>(sn...);
+}
+
 
 template<typename S1, typename S2>
 auto operator + (xvar<S1> s1, xvar<S2> s2) -> xvar<decltype(s1() + s2())> {
