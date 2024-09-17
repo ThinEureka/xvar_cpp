@@ -285,6 +285,7 @@ class xvar_tuple{
         {
         }
 
+        // template <typename T>
         // xvar<T> operator >> (const std::function<T(Sn...)>& f){
             // return xvar<T>(xvar_fn<T, Sn...>::create(f, _sn));
         // }
@@ -301,6 +302,30 @@ class xvar_tuple{
 template<typename... Sn>
 auto x_tuple(xvar<Sn>... sn)-> xvar_tuple<Sn...> {
     return xvar_tuple<Sn...>(sn...);
+}
+
+template<typename T, typename... Sn>
+class xvar_ftuple{
+    public:
+        xvar_ftuple(xvar<Sn>... args) : _sn(args.p()...)
+        {
+        }
+
+        xvar<T> operator >> (const std::function<T(Sn...)>& f){
+            return xvar<T>(xvar_fn<T, Sn...>::create(f, _sn));
+        }
+
+        // xvar<T> link(const std::function<T(Sn...)>& f){
+            // return xvar<T>(xvar_fn<T, Sn...>::create(f, _sn));
+        // }
+    private:
+        std::tuple<xvar_value<Sn>*...> _sn;
+};
+
+
+template<typename T, typename ...Sn>
+auto x_ftuple(xvar<Sn>...sn)->xvar_ftuple<T, Sn...> {
+    return xvar_ftuple<T, Sn...>(sn...);
 }
 
 

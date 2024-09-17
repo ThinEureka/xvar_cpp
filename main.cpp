@@ -253,6 +253,9 @@ void test_x_fn() {
         std::cout<< "y:" << y() << std::endl;
         test(y() == 10.0, "x_fn test 2.2");
 
+        auto z = x_ftuple<T>(x1, x2, x3, x4, x5) >> [=](auto x1, auto x2, auto x3, auto x4, auto x5)
+                {return x1 + x2 + x3 + x4 + x5; };
+
     }
 
     // auto z =  xvar<double>::fn([=](double x1, int x2, char x3, short x4, long x5)-> double {
