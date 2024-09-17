@@ -477,6 +477,60 @@ void test_x_fn() {
     }
 }
 
+void test_x_exp(){
+    {
+        xvar<double> x1 = x_f0(double, 1);
+        xvar<int> x2 = x_f0(int, 2);
+        xvar<char> x3 = x_f0(char, 3);
+        xvar<short> x4 = x_f0(short, 5);
+        xvar<short> x5 = x_f0(short, 4);
+        xvar<double> x6 = x_f0(double, 2.5);
+        xvar<double> x7 = x_f0(double, 0.5);
+        xvar<double> x8 = x_f0(double, -0.5);
+
+        auto y = x1 * x2 + x3*3 - x4*x5*x6 - x7 / x8;
+        std::cout<< "y:" << y() << std::endl;
+        //   y = 1 * 2 + 3 * 3 - 5*4*2.5 + 0.5 / 0.5
+        test(y() == -38.0, "x_exp test 1.1");
+
+        std::cout<< "***********" << std::endl;
+
+        x1.setValue(x1()*2);
+        x2.setValue(x2()*2);
+        x3.setValue(x3()*2);
+        x4.setValue(x4()*2);
+        x5.setValue(-x5());
+        x6.setValue(x6()*2);
+        x7.setValue(x7()*3);
+        x8.setValue(x8()*2);
+        std::cout<< "y:" << y() << std::endl;
+
+        test(y() == 227.5, "x_exp test 1.1");
+    }
+
+    {
+        xvar<double> x1 = x_f0(double, 1);
+        xvar<int> x2 = x_f0(int, 2);
+        xvar<char> x3 = x_f0(char, 3);
+        xvar<short> x4 = x_f0(short, 5);
+
+        auto y = x1 * x2 < x3 + x4;
+        std::cout<< "y:" << y() << std::endl;
+        test(y() == true, "x_exp test 2.1");
+
+        std::cout<< "***********" << std::endl;
+
+        x1.setValue(x1()*8);
+        x2.setValue(x2()*2);
+        x3.setValue(x3()*2);
+        x4.setValue(x4()*2);
+
+        std::cout<< "y:" << y() << std::endl;
+        test(y() == false, "x_exp test 2.1");
+    }
+}
+
+
 // #define dx(op) 1 op 2
 
 int main() {
@@ -488,6 +542,7 @@ int main() {
     test_x_operator_unm();
     test_x_const_lift();
     test_x_fn();
+    test_x_exp();
 
     return 0;
 }
