@@ -354,5 +354,26 @@ auto operator - (xvar<S1> s1) -> xvar<decltype(-s1())> {
 #define x_f2(T, exp, x1, x2) xvar<T>(xvar_f2<T, decltype(x1)::ValueType, decltype(x2)::ValueType>::create\
     ([=](decltype(x1)::ValueType x1, decltype(x2)::ValueType x2)-> T {return (exp);}, x1.p(), x2.p()))
 
+#define x_f3(T, exp, x1, x2, x3) x_form<T>(x1, x2, x3) >>\
+    [=](auto x1, auto x2, auto x3) \
+        {return exp; }
 
+#define x_f4(T, exp, x1, x2, x3, x4) x_form<T>(x1, x2, x3, x4) >>\
+    [=](auto x1, auto x2, auto x3, auto x4) \
+        {return exp; }
 
+#define x_f5(T, exp, x1, x2, x3, x4, x5) x_form<T>(x1, x2, x3, x4, x5) >>\
+    [=](auto x1, auto x2, auto x3, auto x4, auto x5) \
+        {return exp; }
+
+#define x_f6(T, exp, x1, x2, x3, x4, x5, x6) x_form<T>(x1, x2, x3, x4, x5, x6) >> \
+    [=](auto x1, auto x2, auto x3, auto x4, auto x5, auto x6) \
+        {return exp; }
+
+#define x_f7(T, exp, x1, x2, x3, x4, x5, x6, x7) x_form<T>(x1, x2, x3, x4, x5, x6, x7) >> \
+    [=](auto x1, auto x2, auto x3, auto x4, auto x5, auto x6, auto x7) \
+        {return exp; }
+
+#define x_f8(T, exp, x1, x2, x3, x4, x5, x6, x7, x8) x_form<T>(x1, x2, x3, x4, x5, x6, x7, x8) >> \
+    [=](auto x1, auto x2, auto x3, auto x4, auto x5, auto x6, auto x7, auto x8) \
+        {return exp; }

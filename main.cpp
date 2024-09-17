@@ -258,12 +258,11 @@ void test_x_fn() {
         auto z = x_form<T>(x1, x2, x3, x4, x5) >> [=](auto x1, auto x2, auto x3, auto x4, auto x5)
                 {return x1 + x2 + x3 + x4 + x5; };
 
-
         // auto z =  x1 + x2 + x3 + x4 + x5;
         // auto z = x_fn(T, x1 + x2 + x3 + x4 + x5);
 
         std::cout<< "y:" << y() << std::endl;
-        test(z() == 10.0, "x_fn test 2.2");
+        test(z() == 10.0, "x_fn test 2.3");
 
         std::cout<< "***********" << std::endl;
         x1.setValue(x1()*2);
@@ -273,107 +272,178 @@ void test_x_fn() {
         x5.setValue(x5()*2);
 
         std::cout<< "y:" << z() << std::endl;
-        test(z() == 20.0, "x_fn test 2.2");
-
-    }
-
-    // auto z =  xvar<double>::fn([=](double x1, int x2, char x3, short x4, long x5)-> double {
-        // return x1 + x2 + x3 + x4 + x5;
-     // }, x1, x2, x3, x4, x5);
-     //
-    {
-        xvar<double> x1 = x_f0(double, 1);
-        xvar<int> x2 = x_f0(int, 1);
-        xvar<char> x3 = x_f0(char, 1);
-        xvar<short> x4 = x_f0(short, 1);
-        xvar<long> x5 = x_f0(long, 1);
-
-        // typedef double T;
-        // auto y =  xvar<double>::f1([=](double x1)-> double { return x1; }, x1.p());
-        xvar_f1<double, double>::create([=](auto x1){ return x1; }, x1.p());
-
-        // xvar<double>::f1<double>([=](double x1)-> double { return x1; }, x1);
-
-        f1<double, decltype(x1)::ValueType>([=](auto x1){ 
-                int a = 3;
-                return x1 + a; }, x1.p());
+        test(z() == 20.0, "x_fn test 2.4");
     }
 
     {
         xvar<double> x1 = x_f0(double, 1);
-        xvar<int> x2 = x_f0(int, 1);
-        xvar<char> x3 = x_f0(char, 1);
-        xvar<short> x4 = x_f0(short, 1);
-        xvar<long> x5 = x_f0(long, 1);
+        xvar<int> x2 = x_f0(int, 2);
+        xvar<char> x3 = x_f0(char, 3);
+        // xvar<short> x4 = x_f0(short, 5);
+        // xvar<long> x5 = x_f0(long, 5);
 
-        typedef double T;
-        // typedef double T;
-        auto y =  xvar<T>(xvar_fn<T, double, int, char, short, long>::create
-                ([=](auto x1, auto x2, auto x3, auto x4, auto x5)-> T {
-                 return x1 + x2 + x3 + x4 + x5;
-                 }, x1.p(), x2.p(), x3.p(), x4.p(), x5.p()));
+        auto y = x_f3(double, x1*x1 + x2*2 + x3 *3 + 3, x1, x2, x3);
 
-        // auto y = x_list(x1, x2, x3, x4, x5) ->
-                 // [=](auto x1, auto x2, auto x3, auto x4, auto x5) T {
-                             // return x1 + x2 + x3 + x4 + x5;
-                 // };
+        std::cout<< "y:" << y() << std::endl;
+        test(y() == 17.0, "x_fn test 3.1");
+
+        std::cout<< "***********" << std::endl;
+
+        x1.setValue(x1()*2);
+        x2.setValue(x2()*2);
+        x3.setValue(x3()*2);
+        // x4.setValue(x4()*2);
+        // x5.setValue(x5()*2);
+
+        std::cout<< "y:" << y() << std::endl;
+        test(y() == 33.0, "x_fn test 3.2");
     }
 
     {
         xvar<double> x1 = x_f0(double, 1);
-        xvar<int> x2 = x_f0(int, 1);
-        xvar<char> x3 = x_f0(char, 1);
-        xvar<short> x4 = x_f0(short, 1);
-        xvar<long> x5 = x_f0(long, 1);
+        xvar<int> x2 = x_f0(int, 2);
+        xvar<char> x3 = x_f0(char, 3);
+        xvar<short> x4 = x_f0(short, 5);
 
-        typedef double T;
-        auto y =  xvar_fn<T, double, int, char, short, long>::link
-            ([=](auto x1, auto x2, auto x3, auto x4, auto x5)-> T {
-                 return x1 + x2 + x3 + x4 + x5;
-                 }, x1, x2, x3, x4, x5);
+        auto y = x_f4(double, x1*x1 + x2*2 + x3 *3 + 3 - x4, x1, x2, x3, x4);
+
+        std::cout<< "y:" << y() << std::endl;
+        test(y() == 12.0, "x_fn test 4.1");
+
+        std::cout<< "***********" << std::endl;
+
+        x1.setValue(x1()*2);
+        x2.setValue(x2()*2);
+        x3.setValue(x3()*2);
+        x4.setValue(x4()*2);
+
+        std::cout<< "y:" << y() << std::endl;
+        test(y() == 23.0, "x_fn test 4.2");
     }
 
-
     {
-        // typedef double T;
-        // xvar<double>::fn<double, int, char, short, long>([=](auto x1, auto x2, auto x3, auto x4, auto x5)-> int {
-                // return x1 + x2 + x3 + x4 + x5;
-                // });
-
-        // xvar<double>::fn<double, int, char, short, long>([=](double x1, int x2, char x3, short x4, long x5)-> double {
-                // return x1 + x2 + x3 + x4 + x5;
-                // });
         xvar<double> x1 = x_f0(double, 1);
-        xvar<int> x2 = x_f0(int, 1);
-        xvar<char> x3 = x_f0(char, 1);
-        xvar<short> x4 = x_f0(short, 1);
-        xvar<long> x5 = x_f0(long, 1);
+        xvar<int> x2 = x_f0(int, 2);
+        xvar<char> x3 = x_f0(char, 3);
+        xvar<short> x4 = x_f0(short, 5);
+        xvar<short> x5 = x_f0(short, 4);
 
-        // typedef double T;
-       std::function<double(double, int, char, short, long)> f = [=](double x1, int x2, char x3, short x4, long x5) ->double {
-           return x1 + x2 + x3 + x4 + x5;
-       };
+        // 1*1 + 2*2 + 3*3 + 3 - 5 + 3*4*4
+        // 1 +４ + 9 + 3 -5 + 48
+        auto y = x_f5(double, x1*x1 + x2*2 + x3 *3 + 3 - x4 + 3*4*x5, x1, x2, x3, x4, x5);
 
+        std::cout<< "y:" << y() << std::endl;
+        test(y() == 60.0, "x_fn test 5.1");
 
+        std::cout<< "***********" << std::endl;
 
+        x1.setValue(x1()*2);
+        x2.setValue(x2()*2);
+        x3.setValue(x3()*2);
+        x4.setValue(x4()*2);
+        x5.setValue(-x5());
 
-        // xvar<double>::fn<double, int, char, short, long>([=](double x1, int x2, char x3, short x4, long x5) ->double {
-                           // return 0;
-                                  // });
-        // xvar<double>::fn(f);
-        // xvar<double>::fn([=](std::function<double(double, int, char, short,, long)>(double x1, int x2, char x3, short x4, long x5) ->double {
-                           // return 0;
-                                  // });
-        // xvar<double>::fn<double, int, char, short, long>(0);
+        // 2*2 + 4*2 + 6*3 + 3 - 10 + 3*4*(-4)
+        // 4 +8 + 18 + 3 -10 - 48
+        std::cout<< "y:" << y() << std::endl;
+        test(y() == -25.0, "x_fn test 5.2");
     }
 
     {
-        // typedef double T;
-        // auto y =  fn<T, double, int, char, short, long>([=](double x1, int x2, char x3, short x4, long x5)-> T {
-                 // return x1 + x2 + x3 + x4 + x5;
-                 // }, x1.p(), x2.p(), x3.p(), x4.p(), x5.p());
+        xvar<double> x1 = x_f0(double, 1);
+        xvar<int> x2 = x_f0(int, 2);
+        xvar<char> x3 = x_f0(char, 3);
+        xvar<short> x4 = x_f0(short, 5);
+        xvar<short> x5 = x_f0(short, 4);
+        xvar<double> x6 = x_f0(double, 2.5);
+
+        // 1*1 + 2*2 + 3*3 + 3 - 5 + 3*4*4 + 2.5
+        // 1 +４ + 9 + 3 -5 + 48 + 2.5
+        auto y = x_f6(double, x1*x1 + x2*2 + x3 *3 + 3 - x4 + 3*4*x5 + x6, x1, x2, x3, x4, x5, x6);
+
+        std::cout<< "y:" << y() << std::endl;
+        test(y() == 62.5, "x_fn test 6.1");
+
+        std::cout<< "***********" << std::endl;
+
+        x1.setValue(x1()*2);
+        x2.setValue(x2()*2);
+        x3.setValue(x3()*2);
+        x4.setValue(x4()*2);
+        x5.setValue(-x5());
+        x6.setValue(x6()*2);
+
+        // 2*2 + 4*2 + 6*3 + 3 - 10 + 3*4*(-4) + 5.0
+        // 4 +8 + 18 + 3 -10 - 48 + 5.0
+        std::cout<< "y:" << y() << std::endl;
+        test(y() == -20.0, "x_fn test 6.2");
     }
 
+    {
+        xvar<double> x1 = x_f0(double, 1);
+        xvar<int> x2 = x_f0(int, 2);
+        xvar<char> x3 = x_f0(char, 3);
+        xvar<short> x4 = x_f0(short, 5);
+        xvar<short> x5 = x_f0(short, 4);
+        xvar<double> x6 = x_f0(double, 2.5);
+        xvar<double> x7 = x_f0(double, 0.5);
+
+        // 1*1 + 2*2 + 3*3 + 3 - 5 + 3*4*4 + 2.5 - 0.5
+        // 1 +４ + 9 + 3 -5 + 48 + 2.5 - 0.5
+        auto y = x_f7(double, x1*x1 + x2*2 + x3 *3 + 3 - x4 + 3*4*x5 + x6 - x7, x1, x2, x3, x4, x5, x6, x7);
+
+        std::cout<< "y:" << y() << std::endl;
+        test(y() == 62.0, "x_fn test 7.1");
+
+        std::cout<< "***********" << std::endl;
+
+        x1.setValue(x1()*2);
+        x2.setValue(x2()*2);
+        x3.setValue(x3()*2);
+        x4.setValue(x4()*2);
+        x5.setValue(-x5());
+        x6.setValue(x6()*2);
+        x7.setValue(x7()*3);
+
+        // 2*2 + 4*2 + 6*3 + 3 - 10 + 3*4*(-4) + 5.0 - 1.5
+        // 4 +8 + 18 + 3 -10 - 48 + 5.0 - 1.5
+        std::cout<< "y:" << y() << std::endl;
+        test(y() == -21.5, "x_fn test 7.2");
+    }
+
+    {
+        xvar<double> x1 = x_f0(double, 1);
+        xvar<int> x2 = x_f0(int, 2);
+        xvar<char> x3 = x_f0(char, 3);
+        xvar<short> x4 = x_f0(short, 5);
+        xvar<short> x5 = x_f0(short, 4);
+        xvar<double> x6 = x_f0(double, 2.5);
+        xvar<double> x7 = x_f0(double, 0.5);
+        xvar<double> x8 = x_f0(double, -0.5);
+
+        // 1*1 + 2*2 + 3*3 + 3 - 5 + 3*4*4 + 2.5 - 0.5 + 2*(-0.5)
+        // 1 +４ + 9 + 3 -5 + 48 + 2.5 - 0.5 - 1.0
+        auto y = x_f8(double, x1*x1 + x2*2 + x3 *3 + 3 - x4 + 3*4*x5 + x6 - x7 + 2*x8, x1, x2, x3, x4, x5, x6, x7, x8);
+
+        std::cout<< "y:" << y() << std::endl;
+        test(y() == 61.0, "x_fn test 7.1");
+
+        std::cout<< "***********" << std::endl;
+
+        x1.setValue(x1()*2);
+        x2.setValue(x2()*2);
+        x3.setValue(x3()*2);
+        x4.setValue(x4()*2);
+        x5.setValue(-x5());
+        x6.setValue(x6()*2);
+        x7.setValue(x7()*3);
+        x8.setValue(x8()*2);
+
+        // 2*2 + 4*2 + 6*3 + 3 - 10 + 3*4*(-4) + 5.0 - 1.5 + 2*(-1.0)
+        // 4 +8 + 18 + 3 -10 - 48 + 5.0 - 1.5 - 2.0
+        std::cout<< "y:" << y() << std::endl;
+        test(y() == -23.5, "x_fn test 7.2");
+    }
 }
 
 int main() {
