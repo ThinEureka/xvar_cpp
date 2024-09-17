@@ -477,7 +477,7 @@ void test_x_fn() {
     }
 }
 
-#define dx(op) 1 op 2
+// #define dx(op) 1 op 2
 
 int main() {
     test_x_f0();
@@ -488,10 +488,6 @@ int main() {
     test_x_operator_unm();
     test_x_const_lift();
     test_x_fn();
-
-    auto x = dx(+);
-    std::cout << x;
-
 
     return 0;
 }
