@@ -2,7 +2,7 @@
  * \file AsysValue.h
  * \date 9-15-2024 
  * 
- * 
+ * https://github.com/ThinEureka/xvar_cpp
  * \author cs (04nycs@gmail.com)
  */
 
