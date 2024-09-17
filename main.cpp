@@ -253,8 +253,27 @@ void test_x_fn() {
         std::cout<< "y:" << y() << std::endl;
         test(y() == 10.0, "x_fn test 2.2");
 
-        auto z = x_ftuple<T>(x1, x2, x3, x4, x5) >> [=](auto x1, auto x2, auto x3, auto x4, auto x5)
+        std::cout<< "***********" << std::endl;
+
+        auto z = x_form<T>(x1, x2, x3, x4, x5) >> [=](auto x1, auto x2, auto x3, auto x4, auto x5)
                 {return x1 + x2 + x3 + x4 + x5; };
+
+
+        // auto z =  x1 + x2 + x3 + x4 + x5;
+        // auto z = x_fn(T, x1 + x2 + x3 + x4 + x5);
+
+        std::cout<< "y:" << y() << std::endl;
+        test(z() == 10.0, "x_fn test 2.2");
+
+        std::cout<< "***********" << std::endl;
+        x1.setValue(x1()*2);
+        x2.setValue(x2()*2);
+        x3.setValue(x3()*2);
+        x4.setValue(x4()*2);
+        x5.setValue(x5()*2);
+
+        std::cout<< "y:" << z() << std::endl;
+        test(z() == 20.0, "x_fn test 2.2");
 
     }
 
@@ -335,10 +354,13 @@ void test_x_fn() {
            return x1 + x2 + x3 + x4 + x5;
        };
 
+
+
+
         // xvar<double>::fn<double, int, char, short, long>([=](double x1, int x2, char x3, short x4, long x5) ->double {
                            // return 0;
                                   // });
-        xvar<double>::fn(f);
+        // xvar<double>::fn(f);
         // xvar<double>::fn([=](std::function<double(double, int, char, short,, long)>(double x1, int x2, char x3, short x4, long x5) ->double {
                            // return 0;
                                   // });

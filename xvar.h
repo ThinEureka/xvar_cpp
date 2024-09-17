@@ -8,7 +8,7 @@
 
 #include <functional>
 #include <memory>
-#include <iostream>
+// #include <iostream>
 #include <assert.h>
 #include <tuple>
 
@@ -266,14 +266,12 @@ class xvar {
             // return xvar(xvar_f1<T, S1>::create(f, s1.p()));
         // }
 //
-        template <typename ...Sn>
-        static void fn(const std::function<T(Sn...)>& f){
+        // template <typename ...Sn>
+        // static void fn(const std::function<T(Sn...)>& f){
             // return xvar(xvar_fn<T, Sn...>::create(f, args...));
             // return xvar();
-            const void* x = &f;
-            std::cout << x;
-        }
-
+        // }
+//
     private:
         std::shared_ptr<xvar_base> _p;
 };
@@ -305,9 +303,9 @@ auto x_tuple(xvar<Sn>... sn)-> xvar_tuple<Sn...> {
 }
 
 template<typename T, typename... Sn>
-class xvar_ftuple{
+class xvar_form{
     public:
-        xvar_ftuple(xvar<Sn>... args) : _sn(args.p()...)
+        xvar_form(xvar<Sn>... args) : _sn(args.p()...)
         {
         }
 
@@ -324,8 +322,8 @@ class xvar_ftuple{
 
 
 template<typename T, typename ...Sn>
-auto x_ftuple(xvar<Sn>...sn)->xvar_ftuple<T, Sn...> {
-    return xvar_ftuple<T, Sn...>(sn...);
+auto x_form(xvar<Sn>...sn)->xvar_form<T, Sn...> {
+    return xvar_form<T, Sn...>(sn...);
 }
 
 
