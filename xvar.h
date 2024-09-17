@@ -325,31 +325,59 @@ template<typename T, typename ...Sn>
 auto x_form(xvar<Sn>...sn)->xvar_form<T, Sn...> {
     return xvar_form<T, Sn...>(sn...);
 }
-
-
-template<typename S1, typename S2>
-auto operator + (xvar<S1> s1, xvar<S2> s2) -> xvar<decltype(s1() + s2())> {
-    typedef decltype(s1() + s2()) T;
-    return xvar<T>(xvar_f2<T, S1, S2>::create([](S1 s1, S2 s2)-> T {return s1 + s2;}, s1.p(), s2.p()));
+#define x_define_unary_op(op) \
+template<typename S1>\
+auto operator op (xvar<S1> s1) -> xvar<decltype(op s1())> {\
+    typedef decltype(op s1()) T;\
+    return xvar<T>(xvar_f1<T, S1>::create([](S1 s1)-> T {return op s1;}, s1.p()));\
 }
 
-template<typename S1, typename S2>
-auto operator + (xvar<S1> s1, const S2& s2) -> xvar<decltype(s1() + s2)> {
-    typedef decltype(s1() + s2) T;
-    return xvar<T>(xvar_f2<T, S1, S2>::create([](S1 s1, S2 s2)-> T {return s1 + s2;}, s1.p(), xvar<S2>(s2).p()));
+#define x_define_binary_op(op) \
+template<typename S1, typename S2>\
+auto operator op (xvar<S1> s1, xvar<S2> s2) -> xvar<decltype(s1() op s2())> {\
+    typedef decltype(s1() op s2()) T;\
+    return xvar<T>(xvar_f2<T, S1, S2>::create([](S1 s1, S2 s2)-> T {return s1 op s2;}, s1.p(), s2.p()));\
+}\
+\
+template<typename S1, typename S2>\
+auto operator op (xvar<S1> s1, const S2& s2) -> xvar<decltype(s1() op s2)> {\
+    typedef decltype(s1() op s2) T;\
+    return xvar<T>(xvar_f2<T, S1, S2>::create([](S1 s1, S2 s2)-> T {return s1 op s2;}, s1.p(), xvar<S2>(s2).p()));\
+}\
+\
+template<typename S1, typename S2>\
+auto operator op (const S1& s1, xvar<S2> s2) -> xvar<decltype(s1 op s2())> {\
+    typedef decltype(s1 op s2()) T;\
+    return xvar<T>(xvar_f2<T, S1, S2>::create([](S1 s1, S2 s2)-> T {return s1 op s2;}, xvar<S1>(s1).p(), s2.p()));\
 }
 
-template<typename S1, typename S2>
-auto operator + (const S1& s1, xvar<S2> s2) -> xvar<decltype(s1 + s2())> {
-    typedef decltype(s1 + s2()) T;
-    return xvar<T>(xvar_f2<T, S1, S2>::create([](S1 s1, S2 s2)-> T {return s1 + s2;}, xvar<S1>(s1).p(), s2.p()));
-}
+//Arithmetic operators
+x_define_binary_op(+)
+x_define_binary_op(-)
+x_define_binary_op(*)
+x_define_binary_op(/)
+x_define_binary_op(%)
 
-template<typename S1>
-auto operator - (xvar<S1> s1) -> xvar<decltype(-s1())> {
-    typedef decltype(-s1()) T;
-    return xvar<T>(xvar_f1<T, S1>::create([](S1 s1)-> T {return -s1;}, s1.p()));
-}
+x_define_unary_op(-)
+
+//Relational and comparison operators
+x_define_binary_op(==)
+x_define_binary_op(!=)
+x_define_binary_op(<)
+x_define_binary_op(>)
+x_define_binary_op(<=)
+x_define_binary_op(>=)
+
+//Logical operators 
+x_define_unary_op(!)
+x_define_binary_op(&&)
+x_define_binary_op(||)
+
+//Bitwise operators
+x_define_binary_op(&)
+x_define_binary_op(|)
+x_define_binary_op(<<)
+x_define_binary_op(>>)
 
 
 #define x_f0(T, value) xvar<T>(xvar_f0<T>::create((value)))

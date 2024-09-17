@@ -14,6 +14,7 @@
        assert(false);\
    }
 
+
 void test_x_f0(){
     xvar<int> x = x_f0(int, 3);
     std::cout<< "x:" << x() << std::endl;
@@ -476,6 +477,8 @@ void test_x_fn() {
     }
 }
 
+#define dx(op) 1 op 2
+
 int main() {
     test_x_f0();
     test_x_f1();
@@ -485,6 +488,10 @@ int main() {
     test_x_operator_unm();
     test_x_const_lift();
     test_x_fn();
+
+    auto x = dx(+);
+    std::cout << x;
+
 
     return 0;
 }
