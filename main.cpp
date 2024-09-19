@@ -2,6 +2,7 @@
 #include <iostream>
 #include <assert.h>
 #include <string>
+#include <stdio.h>
 
 #define test(exp, name) \
    if (exp) {\
@@ -530,8 +531,42 @@ void test_x_exp(){
     }
 }
 
+void test_x_fn_foreach(){
+    {
+        xvar<double> x1 = x_f0(double, 1);
+        xvar<int> x2 = x_f0(int, 2);
+        xvar<char> x3 = x_f0(char, 3);
+        xvar<short> x4 = x_f0(short, 5);
+        xvar<short> x5 = x_f0(short, 4);
+        xvar<double> x6 = x_f0(double, 2.5);
+        xvar<double> x7 = x_f0(double, 0.5);
+        xvar<double> x8 = x_f0(double, -0.5);
 
-// #define dx(op) 1 op 2
+        // auto y = x_fn(double, x1 * 2 + x2 + x4, x1, x2);
+
+        auto y = x_fn(double, x1 * x2 + x3*3 - x4*x5*x6 - x7 / x8, x1, x2, x3, x4, x5, x6, x7, x8);
+        std::cout<< "y:" << y() << std::endl;
+          // y = 1 * 2 + 3 * 3 - 5*4*2.5 + 0.5 / 0.5
+        test(y() == -38.0, "x fn for each test 1.1");
+
+        std::cout<< "***********" << std::endl;
+
+        x1.setValue(x1()*2);
+        x2.setValue(x2()*2);
+        x3.setValue(x3()*2);
+        x4.setValue(x4()*2);
+        x5.setValue(-x5());
+        x6.setValue(x6()*2);
+        x7.setValue(x7()*3);
+        x8.setValue(x8()*2);
+        std::cout<< "y:" << y() << std::endl;
+
+        test(y() == 227.5, "x fn for each test 1.2");
+    }
+
+}
+
+#define LOG(fmt, ...) printf("[" fmt "]" __VA_OPT__(,) __VA_ARGS__)
 
 int main() {
     test_x_f0();
@@ -543,6 +578,8 @@ int main() {
     test_x_const_lift();
     test_x_fn();
     test_x_exp();
+    test_x_fn_foreach();
+    // LOG("hello");         // => printf("[" "hello" "]" );]"
 
     return 0;
 }

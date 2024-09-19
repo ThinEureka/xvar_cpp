@@ -411,3 +411,24 @@ x_define_binary_op(>>)
 #define x_f8(T, exp, x1, x2, x3, x4, x5, x6, x7, x8) x_form<T>(x1, x2, x3, x4, x5, x6, x7, x8) >> \
     [=](auto x1, auto x2, auto x3, auto x4, auto x5, auto x6, auto x7, auto x8) \
         {return exp; }
+
+#define PARENS ()
+
+#define EXPAND(...) EXPAND4(EXPAND4(EXPAND4(EXPAND4(__VA_ARGS__))))
+#define EXPAND4(...) EXPAND3(EXPAND3(EXPAND3(EXPAND3(__VA_ARGS__))))
+#define EXPAND3(...) EXPAND2(EXPAND2(EXPAND2(EXPAND2(__VA_ARGS__))))
+#define EXPAND2(...) EXPAND1(EXPAND1(EXPAND1(EXPAND1(__VA_ARGS__))))
+#define EXPAND1(...) __VA_ARGS__
+
+#define FOR_EACH(macro, ...)                                    \
+          __VA_OPT__(EXPAND(FOR_EACH_HELPER(macro, __VA_ARGS__)))
+#define FOR_EACH_HELPER(macro, a1, ...)                         \
+          macro(a1)                                                     \
+      __VA_OPT__(FOR_EACH_AGAIN PARENS (macro, __VA_ARGS__))
+#define FOR_EACH_AGAIN() ,FOR_EACH_HELPER
+
+#define AUTO(x) auto x
+
+#define x_fn(T, exp, ...) x_form<T>(__VA_ARGS__) >> \
+    [=](FOR_EACH(AUTO, __VA_ARGS__)) \
+        {return exp; }
