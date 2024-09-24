@@ -114,56 +114,6 @@ class xvar_f0 : public xvar_value<T> {
         }
 };
 
-template <typename T, typename S1>
-class xvar_f1 : public xvar_value<T> {
-    public:
-        static std::shared_ptr<xvar_base> create(const std::function<T(S1)>& f, xvar_value<S1>* s1) {
-            xvar_f1* x = new xvar_f1();
-            x->_f = f;
-            x->_s1 = s1;
-            // x->_isDirty = true;
-            auto s_x = x->s_this();
-            s1->addSink(x);
-            return s_x;
-        }
-
-    protected:
-        void evaluate() override {
-            xvar_value<T>::_value = _f(_s1->_value);
-        }
-
-    private:
-        std::function<T(S1)> _f;
-        xvar_value<S1>* _s1;
-};
-
-template <typename T, typename S1, typename S2>
-class xvar_f2 : public xvar_value<T> {
-    public:
-        static std::shared_ptr<xvar_base> create(const std::function<T(S1, S2)>& f, xvar_value<S1>* s1, xvar_value<S2>* s2) {
-            xvar_f2* x = new xvar_f2();
-            x->_f = f;
-            x->_s1 = s1;
-            x->_s2 = s2;
-            // x->_isDirty = true;
-            auto s_x = x->s_this();
-            s1->addSink(x);
-            s2->addSink(x);
-            return s_x;
-        }
-
-    protected:
-        void evaluate() override {
-            xvar_value<T>::_value = _f(_s1->_value, _s2->_value);
-        }
-
-    private:
-        std::function<T(S1, S2)> _f;
-        xvar_value<S1>* _s1;
-        xvar_value<S2>* _s2;
-};
-
-
 template <typename T, typename ...Sn>
 class xvar_fn : public xvar_value<T> {
     public:
@@ -329,26 +279,26 @@ auto x_form(xvar<Sn>...sn)->xvar_form<T, Sn...> {
 template<typename S1>\
 auto operator op (xvar<S1> s1) -> xvar<decltype(op s1())> {\
     typedef decltype(op s1()) T;\
-    return xvar<T>(xvar_f1<T, S1>::create([](S1 s1)-> T {return op s1;}, s1.p()));\
+    return xvar<T>(xvar_fn<T, S1>::create([](S1 s1)-> T {return op s1;}, s1.p()));\
 }
 
 #define x_define_binary_op(op) \
 template<typename S1, typename S2>\
 auto operator op (xvar<S1> s1, xvar<S2> s2) -> xvar<decltype(s1() op s2())> {\
     typedef decltype(s1() op s2()) T;\
-    return xvar<T>(xvar_f2<T, S1, S2>::create([](S1 s1, S2 s2)-> T {return s1 op s2;}, s1.p(), s2.p()));\
+    return xvar<T>(xvar_fn<T, S1, S2>::create([](S1 s1, S2 s2)-> T {return s1 op s2;}, s1.p(), s2.p()));\
 }\
 \
 template<typename S1, typename S2>\
 auto operator op (xvar<S1> s1, const S2& s2) -> xvar<decltype(s1() op s2)> {\
     typedef decltype(s1() op s2) T;\
-    return xvar<T>(xvar_f2<T, S1, S2>::create([](S1 s1, S2 s2)-> T {return s1 op s2;}, s1.p(), xvar<S2>(s2).p()));\
+    return xvar<T>(xvar_fn<T, S1, S2>::create([](S1 s1, S2 s2)-> T {return s1 op s2;}, s1.p(), xvar<S2>(s2).p()));\
 }\
 \
 template<typename S1, typename S2>\
 auto operator op (const S1& s1, xvar<S2> s2) -> xvar<decltype(s1 op s2())> {\
     typedef decltype(s1 op s2()) T;\
-    return xvar<T>(xvar_f2<T, S1, S2>::create([](S1 s1, S2 s2)-> T {return s1 op s2;}, xvar<S1>(s1).p(), s2.p()));\
+    return xvar<T>(xvar_fn<T, S1, S2>::create([](S1 s1, S2 s2)-> T {return s1 op s2;}, xvar<S1>(s1).p(), s2.p()));\
 }
 
 //Arithmetic operators
@@ -381,36 +331,6 @@ x_define_binary_op(>>)
 
 
 #define x_f0(T, value) xvar<T>(xvar_f0<T>::create((value)))
-
-#define x_f1(T, exp, x) xvar<T>(xvar_f1<T, decltype(x)::ValueType>::create \
-    ([=](decltype(x)::ValueType x)-> T {return (exp);}, x.p()))
-
-#define x_f2(T, exp, x1, x2) xvar<T>(xvar_f2<T, decltype(x1)::ValueType, decltype(x2)::ValueType>::create\
-    ([=](decltype(x1)::ValueType x1, decltype(x2)::ValueType x2)-> T {return (exp);}, x1.p(), x2.p()))
-
-#define x_f3(T, exp, x1, x2, x3) x_form<T>(x1, x2, x3) >>\
-    [=](auto x1, auto x2, auto x3) \
-        {return exp; }
-
-#define x_f4(T, exp, x1, x2, x3, x4) x_form<T>(x1, x2, x3, x4) >>\
-    [=](auto x1, auto x2, auto x3, auto x4) \
-        {return exp; }
-
-#define x_f5(T, exp, x1, x2, x3, x4, x5) x_form<T>(x1, x2, x3, x4, x5) >>\
-    [=](auto x1, auto x2, auto x3, auto x4, auto x5) \
-        {return exp; }
-
-#define x_f6(T, exp, x1, x2, x3, x4, x5, x6) x_form<T>(x1, x2, x3, x4, x5, x6) >> \
-    [=](auto x1, auto x2, auto x3, auto x4, auto x5, auto x6) \
-        {return exp; }
-
-#define x_f7(T, exp, x1, x2, x3, x4, x5, x6, x7) x_form<T>(x1, x2, x3, x4, x5, x6, x7) >> \
-    [=](auto x1, auto x2, auto x3, auto x4, auto x5, auto x6, auto x7) \
-        {return exp; }
-
-#define x_f8(T, exp, x1, x2, x3, x4, x5, x6, x7, x8) x_form<T>(x1, x2, x3, x4, x5, x6, x7, x8) >> \
-    [=](auto x1, auto x2, auto x3, auto x4, auto x5, auto x6, auto x7, auto x8) \
-        {return exp; }
 
 #define PARENS ()
 

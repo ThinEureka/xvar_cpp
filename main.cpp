@@ -28,7 +28,7 @@ void test_x_f1(){
         std::cout<< "x:" << x() << std::endl;
         test(x() == 3, "f1 test 1.1");
 
-        xvar<int> y = x_f1(int, x*x, x);
+        xvar<int> y = x_fn(int, x*x, x);
         std::cout<< "y:" << y() << std::endl;
         test(y() == 9, "f1 test 1.2.1");
 
@@ -46,7 +46,7 @@ void test_x_f1(){
         std::cout<< "x:" << x() << std::endl;
         test(x() == 3, "f1 test 2.1");
 
-        xvar<std::string> y = x_f1(std::string, std::to_string(x) + "_kkk", x);
+        xvar<std::string> y = x_fn(std::string, std::to_string(x) + "_kkk", x);
         std::cout<< "y:" << y() << std::endl;
         test(y() == "3_kkk", "f1 test 2.1.1");
 
@@ -67,7 +67,7 @@ void test_x_f2(){
         test(y() == 4, "f2 test 1.1.2");
 
 
-        xvar<int> z = x_f2(int, x+y, x, y);
+        xvar<int> z = x_fn(int, x+y, x, y);
         std::cout<< "z:" << z() << std::endl;
         test(z() == 7, "f2 test 1.2.1");
 
@@ -89,7 +89,7 @@ void test_x_f2_auto(){
         test(x() == 3, "f2 auto test 1.1.1");
         test(y() == 4, "f2 auto test 1.1.2");
 
-        auto z = x_f2(int, x+y, x, y);
+        auto z = x_fn(int, x+y, x, y);
         std::cout<< "z:" << z() << std::endl;
         test(z() == 7, "f2 auto test 1.2.1");
 
@@ -217,16 +217,6 @@ void test_x_const_lift(){
     std::cout<< "===========" << std::endl;
 }
 
-template <typename T, typename S1>
-static xvar<T> f1(const std::function<T(S1)>& f, xvar_value<S1>* s1) {
-    return xvar<T>(xvar_f1<T, S1>::create(f, s1));
-}
-
-template <typename T, typename ...Sn>
-static xvar<T> fn(const std::function<T(Sn...)>& f, xvar_value<Sn>... args) {
-    return xvar<T>(xvar_fn<T, Sn...>::create(f, args...));
-}
-
 void test_x_fn() {
     {
         xvar<double> x1 = x_f0(double, 1);
@@ -314,7 +304,7 @@ void test_x_fn() {
         // xvar<short> x4 = x_f0(short, 5);
         // xvar<long> x5 = x_f0(long, 5);
 
-        auto y = x_f3(double, x1*x1 + x2*2 + x3 *3 + 3, x1, x2, x3);
+        auto y = x_fn(double, x1*x1 + x2*2 + x3 *3 + 3, x1, x2, x3);
 
         std::cout<< "y:" << y() << std::endl;
         test(y() == 17.0, "x_fn test 3.1");
@@ -337,7 +327,7 @@ void test_x_fn() {
         xvar<char> x3 = x_f0(char, 3);
         xvar<short> x4 = x_f0(short, 5);
 
-        auto y = x_f4(double, x1*x1 + x2*2 + x3 *3 + 3 - x4, x1, x2, x3, x4);
+        auto y = x_fn(double, x1*x1 + x2*2 + x3 *3 + 3 - x4, x1, x2, x3, x4);
 
         std::cout<< "y:" << y() << std::endl;
         test(y() == 12.0, "x_fn test 4.1");
@@ -362,7 +352,7 @@ void test_x_fn() {
 
         // 1*1 + 2*2 + 3*3 + 3 - 5 + 3*4*4
         // 1 +４ + 9 + 3 -5 + 48
-        auto y = x_f5(double, x1*x1 + x2*2 + x3 *3 + 3 - x4 + 3*4*x5, x1, x2, x3, x4, x5);
+        auto y = x_fn(double, x1*x1 + x2*2 + x3 *3 + 3 - x4 + 3*4*x5, x1, x2, x3, x4, x5);
 
         std::cout<< "y:" << y() << std::endl;
         test(y() == 60.0, "x_fn test 5.1");
@@ -391,7 +381,7 @@ void test_x_fn() {
 
         // 1*1 + 2*2 + 3*3 + 3 - 5 + 3*4*4 + 2.5
         // 1 +４ + 9 + 3 -5 + 48 + 2.5
-        auto y = x_f6(double, x1*x1 + x2*2 + x3 *3 + 3 - x4 + 3*4*x5 + x6, x1, x2, x3, x4, x5, x6);
+        auto y = x_fn(double, x1*x1 + x2*2 + x3 *3 + 3 - x4 + 3*4*x5 + x6, x1, x2, x3, x4, x5, x6);
 
         std::cout<< "y:" << y() << std::endl;
         test(y() == 62.5, "x_fn test 6.1");
@@ -422,7 +412,7 @@ void test_x_fn() {
 
         // 1*1 + 2*2 + 3*3 + 3 - 5 + 3*4*4 + 2.5 - 0.5
         // 1 +４ + 9 + 3 -5 + 48 + 2.5 - 0.5
-        auto y = x_f7(double, x1*x1 + x2*2 + x3 *3 + 3 - x4 + 3*4*x5 + x6 - x7, x1, x2, x3, x4, x5, x6, x7);
+        auto y = x_fn(double, x1*x1 + x2*2 + x3 *3 + 3 - x4 + 3*4*x5 + x6 - x7, x1, x2, x3, x4, x5, x6, x7);
 
         std::cout<< "y:" << y() << std::endl;
         test(y() == 62.0, "x_fn test 7.1");
@@ -455,7 +445,7 @@ void test_x_fn() {
 
         // 1*1 + 2*2 + 3*3 + 3 - 5 + 3*4*4 + 2.5 - 0.5 + 2*(-0.5)
         // 1 +４ + 9 + 3 -5 + 48 + 2.5 - 0.5 - 1.0
-        auto y = x_f8(double, x1*x1 + x2*2 + x3 *3 + 3 - x4 + 3*4*x5 + x6 - x7 + 2*x8, x1, x2, x3, x4, x5, x6, x7, x8);
+        auto y = x_fn(double, x1*x1 + x2*2 + x3 *3 + 3 - x4 + 3*4*x5 + x6 - x7 + 2*x8, x1, x2, x3, x4, x5, x6, x7, x8);
 
         std::cout<< "y:" << y() << std::endl;
         test(y() == 61.0, "x_fn test 7.1");
