@@ -1,3 +1,4 @@
+#define XVAR_TEST_LIFETIME 
 #include "xvar.h"
 #include <iostream>
 #include <assert.h>
@@ -556,7 +557,6 @@ void test_x_fn_foreach(){
 
 }
 
-#define LOG(fmt, ...) printf("[" fmt "]" __VA_OPT__(,) __VA_ARGS__)
 
 int main() {
     test_x_f0();
@@ -569,6 +569,11 @@ int main() {
     test_x_fn();
     test_x_exp();
     test_x_fn_foreach();
+
+#ifdef XVAR_TEST_LIFETIME
+    std::cout << "xvar_base::s_totalCount:" << xvar_base::s_totalCount << std::endl;
+    test(xvar_base::s_totalCount == 0, "xvar lifetime test 1");
+#endif
     // LOG("hello");         // => printf("[" "hello" "]" );]"
 
     return 0;

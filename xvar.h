@@ -13,6 +13,16 @@
 #include <tuple>
 
 class xvar_base {
+#ifdef XVAR_TEST_LIFETIME 
+    public:
+        static int s_totalCount;
+
+    public:
+        xvar_base(){
+            s_totalCount++;
+        }
+#endif
+
     public:
         std::weak_ptr<xvar_base> w_this(){
             return s_this();
@@ -34,6 +44,13 @@ class xvar_base {
             _sinks.push_back(sink->w_this());
             sink->_sources.push_back(s_this());
         }
+
+#ifdef XVAR_TEST_LIFETIME 
+    public:
+        virtual ~xvar_base() {
+            s_totalCount--;
+        }
+#endif 
 
     protected:
         void validate() {
