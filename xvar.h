@@ -11,6 +11,7 @@
 // #include <iostream>
 #include <assert.h>
 #include <tuple>
+#include <map>
 
 class xvar_base {
 #ifdef XVAR_TEST_LIFETIME 
@@ -25,7 +26,8 @@ class xvar_base {
 
     public:
         std::weak_ptr<xvar_base> w_this(){
-            return s_this();
+            s_this();
+            return _w_this;
         }
 
         std::shared_ptr<xvar_base> s_this(){
@@ -41,16 +43,29 @@ class xvar_base {
         }
 
         void addSink(xvar_base* sink) {
-            _sinks.push_back(sink->w_this());
-            sink->_sources.push_back(s_this());
+            auto it = _sinks.find(sink);
+            if (it == _sinks.end()){
+                _sinks.insert({sink, sink});
+                sink->_sources.insert({this, s_this()});
+            }
         }
 
-#ifdef XVAR_TEST_LIFETIME 
+        void removeSink(xvar_base* sink) {
+            _sinks.erase(_sinks.find(sink));
+            sink->_sources.erase(sink->_sources.find(this));
+        }
+
     public:
         virtual ~xvar_base() {
+#ifdef XVAR_TEST_LIFETIME 
             s_totalCount--;
-        }
 #endif 
+            while (!_sources.empty()){
+                auto it = _sources.begin();
+                auto source = it->first;
+                source->removeSink(this);
+            }
+        }
 
     protected:
         void validate() {
@@ -58,8 +73,8 @@ class xvar_base {
 
             _isDirty = false;
             for (auto it = _sources.begin(); it != _sources.end(); ++it) {
-                auto s_ptr = *it;
-                s_ptr->validate();
+                auto ptr = it->first;
+                ptr->validate();
             }
 
             evaluate();
@@ -69,16 +84,9 @@ class xvar_base {
             if (_isDirty) return;
 
             _isDirty = true;
-            for (auto it = _sinks.begin(); it != _sinks.end();) {
-                auto w_ptr = *it;
-                std::shared_ptr<xvar_base> s_ptr = w_ptr.lock();
-                if (s_ptr) {
-                    s_ptr->setDirty();
-                    it++;
-                } else {
-                    auto oldIt = it++;
-                    _sinks.erase(oldIt);
-                }
+            for (auto it = _sinks.begin(); it != _sinks.end(); ++it) {
+                auto ptr = it->first;
+                ptr->setDirty();
             }
         }
 
@@ -88,8 +96,8 @@ class xvar_base {
 
     protected:
         bool _isDirty = true;
-        std::vector<std::weak_ptr<xvar_base>> _sinks;
-        std::vector<std::shared_ptr<xvar_base>> _sources;
+        std::map<xvar_base*, xvar_base*> _sinks;
+        std::map<xvar_base*, std::shared_ptr<xvar_base>> _sources;
         std::weak_ptr<xvar_base> _w_this;
 };
 
